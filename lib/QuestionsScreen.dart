@@ -56,7 +56,8 @@ class _QuizWedgitState extends State<QuizWedgit> {
       a = widget.q[index].getSuffiledanswers;
       isFirst = false;
     }
-
+    print(index);
+    print(widget.q.length);
     return Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -99,7 +100,7 @@ class _QuizWedgitState extends State<QuizWedgit> {
                     ),
                   ))
               .toList(),
-          (!(index == a.length - 1))
+          (index < widget.q.length - 1 && _isanswerd)
               ? Button(() {
                   setState(() {
                     index++;
