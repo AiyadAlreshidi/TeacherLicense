@@ -13,6 +13,8 @@ Color get getRandomColor => RandomColor().randomColor(
         ColorBrightness.maxBrightness)));
 
 class VedioBuilder extends StatelessWidget {
+  VedioBuilder(this._list);
+  List<Vedios> _list = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,32 +22,31 @@ class VedioBuilder extends StatelessWidget {
         title: Text("الدورات"),
       ),
       body: ListView.builder(
-        itemCount: FinalVedios.vedios.length,
+        itemCount: _list.length,
         itemBuilder: (BuildContext context, int index) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               GestureDetector(
                 onTap: () {
-                  Get.to(ViewVedio(FinalVedios.vedios[index]));
+                  Get.to(ViewVedio(_list[index]));
                 },
-                child: Card(
-                  color: getRandomColor,
-                  margin:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-                  elevation: 4,
-                  child: Column(
-                    children: [
-                      AutoDirection(
-                        text: FinalVedios.vedios[index].name,
-                        child: Text(FinalVedios.vedios[index].name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              letterSpacing: 1.2,
-                            ),
-                            textAlign: TextAlign.center),
-                      ),
-                    ],
+                child: Container(
+                  height: Get.height * 0.09,
+                  child: Card(
+                    color: getRandomColor,
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                    elevation: 4,
+                    child: AutoDirection(
+                      text: _list[index].name,
+                      child: Text(_list[index].name,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            letterSpacing: 1.2,
+                          ),
+                          textAlign: TextAlign.center),
+                    ),
                   ),
                 ),
               ),
@@ -87,7 +88,11 @@ class _ViewVedioState extends State<ViewVedio> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: Text(widget.v.name),centerTitle: true,),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.v.name),
+        centerTitle: true,
+      ),
       body: YoutubePlayerBuilder(
         builder: (BuildContext, Widget) {
           return Column(
@@ -99,8 +104,12 @@ class _ViewVedioState extends State<ViewVedio> {
               SizedBox(
                 height: Get.height * 0.07,
               ),
-              AutoDirection(text: widget.v.name,
-              child: Text(widget.v.name,style: TextStyle(fontSize: 20),))
+              AutoDirection(
+                  text: widget.v.name,
+                  child: Text(
+                    widget.v.name,
+                    style: TextStyle(fontSize: 20),
+                  ))
             ],
           );
         },

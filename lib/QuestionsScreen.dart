@@ -1,6 +1,4 @@
-import 'package:TeacherLicense/Question.dart';
-import 'package:TeacherLicense/Vedios.dart';
-import 'package:TeacherLicense/VediosBuilder.dart';
+import 'package:TeacherLicense/PlsStudeHard.dart';
 import 'package:arabic_numbers/arabic_numbers.dart';
 import 'package:auto_direction/auto_direction.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +6,13 @@ import 'package:get/get.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 import 'Button.dart';
+import 'Tests.dart';
 
 class QuestionsScreen extends StatelessWidget {
   RxInt _degrees = 0.obs;
-
   int testNumber;
-  QuestionsScreen(this.testNumber);
+  var Localjson;
+  QuestionsScreen(this.testNumber, this.Localjson);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,11 +21,10 @@ class QuestionsScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          QuizWedgit(
-              QFinal.questions
-                  .where((element) => element.testNum == testNumber)
-                  .toList(),
-              _degrees),
+          QuizWedgit(<Tests>[
+            for (int i = 0; i < (Localjson[testNumber] as List).length; i++)
+              Tests.fromJson(Localjson[testNumber][i]),
+          ], _degrees),
           Obx(() => AutoDirection(
               text: 'عربي',
               child: Text(
@@ -41,7 +39,7 @@ class QuestionsScreen extends StatelessWidget {
 
 class QuizWedgit extends StatefulWidget {
   QuizWedgit(this.q, this.deg);
-  List<Question> q;
+  List<Tests> q;
   RxInt deg;
   @override
   _QuizWedgitState createState() => _QuizWedgitState();
@@ -57,7 +55,7 @@ class _QuizWedgitState extends State<QuizWedgit> {
   @override
   Widget build(BuildContext context) {
     if (isFirst) {
-      a = widget.q[index].getSuffiledanswers;
+      a = widget.q[index].SuffleIt(widget.q[index]);
       isFirst = false;
     }
     print(index);
@@ -68,18 +66,23 @@ class _QuizWedgitState extends State<QuizWedgit> {
         AutoDirection(
           text: "يسب",
           child: Text(
-            "${ArabicNumbers().convert(index + 1)}- ${widget.q[index].question}",
+            "${ArabicNumbers().convert(index + 1)}- ${widget.q[index].s0}",
             style: TextStyle(
                 color: Colors.blue, fontWeight: FontWeight.bold, fontSize: 25),
             textAlign: TextAlign.center,
           ),
         ),
+        if (GetUtils.isURL(widget.q[index].image))
+          Image.network(
+            widget.q[index].image,
+            height: Get.height * 0.2,
+          ),
         AutoDirection(
             text: "عربي",
             child: Text(
-              "${ArabicNumbers().convert(QFinal.questions.length - index - 1)}سؤال متبقي ",
+              "${ArabicNumbers().convert(widget.q.length - index - 1)} سؤال متبقي ",
               textAlign: TextAlign.left,
-              style: TextStyle(color: Colors.red, fontSize: 15),
+              style: TextStyle(color: Colors.red, fontSize: 17),
             )),
         ...a
             .map((e) => Padding(
@@ -88,7 +91,7 @@ class _QuizWedgitState extends State<QuizWedgit> {
                     width: Get.width,
                     child: FlatButton(
                       textColor: Colors.white,
-                      color: e == widget.q[index].answers[0] && _isanswerd
+                      color: e == widget.q[index].s1 && _isanswerd
                           ? Colors.green
                           : Colors.orange,
                       child: Text(
@@ -99,7 +102,7 @@ class _QuizWedgitState extends State<QuizWedgit> {
                         ),
                       ),
                       onPressed: () {
-                        if (e == widget.q[index].answers[0] && !_isanswerd) {
+                        if (e == widget.q[index].s1 && !_isanswerd) {
                           print('true');
                           widget.deg.value++;
                         } else {
@@ -116,6 +119,9 @@ class _QuizWedgitState extends State<QuizWedgit> {
             .toList(),
         (index < widget.q.length - 1)
             ? Button(() {
+                if (_isanswerd == false) {
+                  answerdwrong.add(index);
+                }
                 setState(() {
                   index++;
                   _isanswerd = false;
@@ -124,6 +130,9 @@ class _QuizWedgitState extends State<QuizWedgit> {
               }, "السؤال التالي")
             : FlatButton(
                 onPressed: () {
+                  if (_isanswerd == false) {
+                    answerdwrong.add(index);
+                  }
                   Get.dialog(AlertDialog(
                     title: AutoDirection(
                         text: "عربي",
@@ -133,64 +142,34 @@ class _QuizWedgitState extends State<QuizWedgit> {
                               "لقد حصلت علي ${widget.deg} درجات من ${widget.q.length}",
                               textAlign: TextAlign.center,
                             ),
-                            FlatButton(
-                                onPressed: () {
-                                  List<Question> errors = [];
-                                  answerdwrong.forEach((element) {
-                                    errors.add(QFinal.questions[element]);
-                                  });
-                                  Get.to(FalseResults(errors));
-                                },
-                                child: Text(
-                                  "معرفة الاخطاء والاستذكار",
-                                  style: TextStyle(
-                                      color: Colors.blue, fontSize: 16),
-                                )),
+                            answerdwrong.isNotEmpty
+                                ? FlatButton(
+                                    onPressed: () {
+                                      List<Tests> errors = [];
+                                      answerdwrong.forEach((element) {
+                                        errors.add(widget.q[element]);
+                                      });
+                                      Get.to(PlsStudeHard(
+                                          errors.toSet().toList()));
+                                    },
+                                    child: Text(
+                                      "معرفة الاخطاء والاستذكار",
+                                      style: TextStyle(
+                                          color: Colors.blue, fontSize: 16),
+                                    ))
+                                : SizedBox(),
                           ],
                         )),
                   ));
                 },
-                child: Text("عرض التقرير",style: TextStyle(color: Colors.red,fontSize: 24
-                ),)),
-        SizedBox(height: 20,)
+                child: Text(
+                  "عرض التقرير",
+                  style: TextStyle(color: Colors.red, fontSize: 24),
+                )),
+        SizedBox(
+          height: 20,
+        )
       ],
-    );
-  }
-}
-
-class FalseResults extends StatelessWidget {
-  List<Question> errors;
-  FalseResults(this.errors);
-  @override
-  Widget build(BuildContext context) {
-    print(errors.length);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("تعلم من اخطاءك وراجع مره اخري"),
-      ),
-      body: AutoDirection(
-        text: "يسب",
-        child: ListView(
-          children: errors
-              .map((e) => ListTile(
-                    trailing: IconButton(
-                      icon: Icon(Icons.video_collection_outlined),
-                      onPressed: () {
-                        Get.to(ViewVedio(Vedios(0, e.explain, e.question)));
-                      },
-                    ),
-                    title: Text(
-                      e.question,
-                      style: TextStyle(fontSize: 17),
-                    ),
-                    subtitle: Text(
-                      e.answers[0],
-                      style: TextStyle(fontSize: 17, color: Colors.green),
-                    ),
-                  ))
-              .toList(),
-        ),
-      ),
     );
   }
 }

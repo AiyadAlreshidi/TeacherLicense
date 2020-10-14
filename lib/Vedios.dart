@@ -1,25 +1,18 @@
-class Vedios{
-  int number;
+class Vedios {
   String name;
   String id;
 
+  Vedios(this.id, this.name);
 
-  Vedios(this.number,this.id,this.name);
+  Vedios.fromJson(Map<String, dynamic> json) {
+    id = json['link'];
+    name = json['text'];
+  }
 
-
-
-}
-
-class FinalVedios{
-
- static List<Vedios> vedios =[
-    Vedios(0, "o_eVKOqY48Q","الدرس الاول : تطيبقات علي الدوال"),
-    Vedios(1, "_IsVy72DE58","الدرس الثاني : تطيبقات علي الاعداد"),
-    Vedios(2, "a2mAYCJ5sNM","الدرس الثالث : تطيبقات علي الجمع والطرح"),
-
-
-
-  ];
-
-
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['link'] = this.id;
+    data['text'] = this.name;
+    return data;
+  }
 }

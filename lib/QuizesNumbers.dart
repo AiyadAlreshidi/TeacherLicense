@@ -1,10 +1,13 @@
 import 'package:TeacherLicense/Button.dart';
-import 'package:TeacherLicense/Question.dart';
 import 'package:TeacherLicense/QuestionsScreen.dart';
+import 'package:TeacherLicense/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class QuizesNumber extends StatelessWidget {
+  var LocaljSON;
+  int numOfTests;
+  QuizesNumber(this.LocaljSON,this.numOfTests);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,27 +22,13 @@ class QuizesNumber extends StatelessWidget {
               mainAxisSpacing: Get.height * 0.03,
               crossAxisSpacing: Get.width * 0.1),
           children: [
-            for (int i = 1; i <= NumofTests; i++)
+            for (int i = 1; i <= numOfTests; i++)
               Button(() {
-                Get.to(QuestionsScreen(i));
+                Get.to(QuestionsScreen(i-1,LocaljSON));
               }, "اختبار $i"),
           ],
         ),
       ),
     );
   }
-}
-
-int get NumofTests {
-  int i = 0;
-  QFinal.questions.forEach((element) {
-    if(element.testNum>i){
-      i=element.testNum;
-    }
-
-
-  });
-
-
-  return i;
 }
